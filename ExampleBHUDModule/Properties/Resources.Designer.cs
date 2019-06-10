@@ -59,15 +59,5 @@ namespace ExampleBHUDModule.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] _ref {
-            get {
-                object obj = ResourceManager.GetObject("_ref", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

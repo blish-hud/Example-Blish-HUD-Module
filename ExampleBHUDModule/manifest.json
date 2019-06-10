@@ -1,0 +1,73 @@
+{
+  "name": "Example Module",
+  "version": "0.1.2",
+  "namespace": "bh.example.examplemodule",
+  "package": "ExampleBHUDModule.dll",
+  "manifest_version": 1,
+
+  "description": "Acts as an example on how to create a Blish HUD module.",
+  "dependencies": {
+    "bh.general.markersandpaths": ">=0.1.2"
+  },
+  "url": "https://github.com/blish-hud/Blish-HUD",
+  "author": {
+    "name": "Freesnöw",
+    "username": "LandersXanders.1235"
+  },
+  "contributers": [
+    {
+      "name": "Freesnöw",
+      "username": "LandersXanders.1235"
+    },
+    {
+      "name": "Freesnöw2",
+      "username": "LandersXanders2.1235"
+    }
+  ],
+
+  "directories": [ "markers" ],
+  "actions": [ "Reload Markers" ],
+  "enabled_without_gw2": false,
+  "api_permissions": {
+    "account": {
+      "optional": true,
+      "details": "Needed if you want the special feature enabled."
+    },
+    "inventories": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "characters": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "tradingpost": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "wallet": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "unlocks": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "pvp": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "builds": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "progression": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    },
+    "guilds": {
+      "optional": false,
+      "details": "Needed to review the item in your inventory."
+    }
+  }
+}
