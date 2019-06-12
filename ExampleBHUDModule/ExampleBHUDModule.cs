@@ -2,28 +2,27 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
+using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ExampleBHUDModule {
 
     [Export(typeof(ExternalModule))]
-    public class ExampleBHUDModule : Blish_HUD.Modules.ExternalModule {
+    public class ExampleBHUDModule : ExternalModule {
 
-        private Texture2D               _mugTexture;
-        private CornerIcon              _exampleIcon;
-        private double                  _runningTime     = 0;
-        private long                    _fakeLoadCounter = 0;
-        private CancellationTokenSource _fakeLoadCounterCT;
+        private Texture2D     _mugTexture;
+        private double        _runningTime = 0;
+        private List<Dungeon> _dungeons;
+
+        // Controls (be sure to dispose of these in Unload()
+        private CornerIcon       _exampleIcon;
+        private ContextMenuStrip _dungeonContextMenuStrip;
 
         /// <summary>
         /// Ideally you should keep the constructor as is.
@@ -47,7 +46,7 @@ namespace ExampleBHUDModule {
         /// and render loop, so be sure to not do anything here that takes too long.
         /// </summary>
         protected override void Initialize() {
-            Console.WriteLine("Example Blish HUD module initialized.");
+            GameService.Debug.WriteInfoLine("Example Blish HUD module initialized.");
         }
 
         /// <summary>
@@ -58,14 +57,18 @@ namespace ExampleBHUDModule {
         /// You will want to queue them to add later while on the main thread or in a delegate queued
         /// with <see cref="Blish_HUD.DirectorService.QueueMainThreadUpdate(Action{GameTime})"/>.
         /// </summary>
-        protected override void LoadAsync() {
+        protected override async Task LoadAsync() {
             // Load content from the ref directory automatically with the ContentsManager
             _mugTexture = ContentsManager.GetTexture("603447.png");
+
+            // Use the Gw2ApiManager to make requests to the API using the permissions provided in your manifest
+            var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.Dungeons.AllAsync();
+            _dungeons = dungeonRequest.ToList();
 
             // Recall your settings values with the SettingsManager
             SettingEntry<string> setting1 = SettingsManager.GetSetting<string>("This is an example setting.");
 
-            // Get your registered directories with the DirectoriesManager
+            // Get your manifest registered directories with the DirectoriesManager
             foreach (string directoryName in this.DirectoriesManager.RegisteredDirectories) {
                 string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
 
@@ -82,15 +85,34 @@ namespace ExampleBHUDModule {
         /// <see cref="ExternalModule.Loaded" /> to update correctly.
         /// </summary>
         protected override void OnModuleLoaded(EventArgs e) {
+            // Add a mug icon in the top left next to the other icons
             _exampleIcon = new CornerIcon() {
                 Icon             = _mugTexture,
                 BasicTooltipText = $"{this.Name} [{this.Namespace}]",
                 Parent           = GameService.Graphics.SpriteScreen
             };
 
+            // Show a notification in the middle of the screen when the icon is clicked
             _exampleIcon.Click += delegate(object sender, MouseEventArgs args) {
-                Notification.ShowNotification(null, "Hello from Blish HUD!", 4);
+                Notification.ShowNotification("Hello from Blish HUD!", Notification.NotificationType.Blue, null, 5);
             };
+
+            // Add a right click menu to the icon that shows each Revenant legend (pulled from the API)
+            _dungeonContextMenuStrip = new ContextMenuStrip();
+
+            foreach (var dungeon in _dungeons) {
+                var dungeonItem = _dungeonContextMenuStrip.AddMenuItem(dungeon.Id);
+
+                var dungeonMenu = new ContextMenuStrip();
+
+                foreach (var path in dungeon.Paths) {
+                    dungeonMenu.AddMenuItem($"{path.Id} ({path.Type})");
+                }
+
+                dungeonItem.Submenu = dungeonMenu;
+            }
+
+            _exampleIcon.Menu = _dungeonContextMenuStrip;
 
             base.OnModuleLoaded(e);
         }
@@ -105,9 +127,9 @@ namespace ExampleBHUDModule {
         protected override void Update(GameTime gameTime) {
             _runningTime += gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            if (_runningTime > 10000) {
-                _runningTime -= 10000;
-                Console.WriteLine("The example module you have enabled writes output every 10 seconds.");
+            if (_runningTime > 60000) {
+                _runningTime -= 60000;
+                GameService.Debug.WriteInfoLine("The example module you have enabled writes output every 60 seconds.");
             }
         }
 
@@ -117,11 +139,12 @@ namespace ExampleBHUDModule {
         /// Be sure to remove any tabs added to the Director window, CornerIcons, etc.
         /// </summary>
         protected override void Unload() {
-            Console.WriteLine($"Unloading module '{Name}'.");
+            GameService.Debug.WriteInfoLine($"Unloading module '{Name}'.");
 
             _exampleIcon.Dispose();
+            _dungeonContextMenuStrip.Dispose();
 
-            Console.WriteLine($"Module '{Name}' unloaded.");
+            GameService.Debug.WriteInfoLine($"Module '{Name}' unloaded.");
         }
 
     }
