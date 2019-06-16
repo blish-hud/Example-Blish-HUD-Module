@@ -7,18 +7,21 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
+using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ExampleBHUDModule {
 
-    [Export(typeof(ExternalModule))]
-    public class ExampleBHUDModule : ExternalModule {
+    [Export(typeof(Module))]
+    public class ExampleBHUDModule : Module {
 
         private Texture2D     _mugTexture;
         private double        _runningTime = 0;
         private List<Dungeon> _dungeons;
+
+        private SettingEntry<bool> _anotherExampleSetting;
 
         // Controls (be sure to dispose of these in Unload()
         private CornerIcon       _exampleIcon;
@@ -35,9 +38,11 @@ namespace ExampleBHUDModule {
         /// Define the settings you would like to use in your module.  Settings are persistent
         /// between updates to both Blish HUD and your module.
         /// </summary>
-        protected override void DefineSettings(SettingsManager settingsManager) {
-            settingsManager.DefineSetting("This is an example setting.",          "This is the value of the setting", "This is the default value", true, "If exposed, this setting will be shown in settings with this description, automatically.");
-            settingsManager.DefineSetting("Settings can be many different types", true,                               true,                        true, "This setting is a bool setting.");
+        protected override void DefineSettings(SettingCollection settings) {
+            settings.DefineSetting("ExampleSetting.", "This is the value of the setting", "Display name of setting", "If exposed, this setting will be shown in settings with this description, automatically.");
+
+            // Assigning the return value is the preferred way of keeping track of your settings
+            _anotherExampleSetting = settings.DefineSetting("AnotherExample", true, "This setting is a bool setting.", "Settings can be many different types");
         }
 
         /// <summary>
@@ -65,8 +70,9 @@ namespace ExampleBHUDModule {
             var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.Dungeons.AllAsync();
             _dungeons = dungeonRequest.ToList();
 
-            // Recall your settings values with the SettingsManager
-            SettingEntry<string> setting1 = SettingsManager.GetSetting<string>("This is an example setting.");
+            // If you really need to, you can recall your settings values with the SettingsManager
+            // It is better if you just hold onto the returned "TypeEntry" instance when doing your initial DefineSetting, though
+            SettingEntry<string> setting1 = SettingsManager.ModuleSettings["ExampleSetting"] as SettingEntry<string>;
 
             // Get your manifest registered directories with the DirectoriesManager
             foreach (string directoryName in this.DirectoriesManager.RegisteredDirectories) {
