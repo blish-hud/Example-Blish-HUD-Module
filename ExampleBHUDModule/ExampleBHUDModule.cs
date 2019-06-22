@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
-using Blish_HUD.Modules.Managers;
+using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,7 +51,7 @@ namespace ExampleBHUDModule {
         /// and render loop, so be sure to not do anything here that takes too long.
         /// </summary>
         protected override void Initialize() {
-            GameService.Debug.WriteInfoLine("Example Blish HUD module initialized.");
+            
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace ExampleBHUDModule {
 
             // Show a notification in the middle of the screen when the icon is clicked
             _exampleIcon.Click += delegate(object sender, MouseEventArgs args) {
-                Notification.ShowNotification("Hello from Blish HUD!", Notification.NotificationType.Blue, null, 5);
+                ScreenNotification.ShowNotification("Hello from Blish HUD!");
             };
 
             // Add a right click menu to the icon that shows each Revenant legend (pulled from the API)
@@ -135,7 +135,7 @@ namespace ExampleBHUDModule {
 
             if (_runningTime > 60000) {
                 _runningTime -= 60000;
-                GameService.Debug.WriteInfoLine("The example module you have enabled writes output every 60 seconds.");
+                ScreenNotification.ShowNotification("The examples module shows this message every 60 seconds!", ScreenNotification.NotificationType.Warning);
             }
         }
 
@@ -145,12 +145,8 @@ namespace ExampleBHUDModule {
         /// Be sure to remove any tabs added to the Director window, CornerIcons, etc.
         /// </summary>
         protected override void Unload() {
-            GameService.Debug.WriteInfoLine($"Unloading module '{Name}'.");
-
             _exampleIcon.Dispose();
             _dungeonContextMenuStrip.Dispose();
-
-            GameService.Debug.WriteInfoLine($"Module '{Name}' unloaded.");
         }
 
     }
