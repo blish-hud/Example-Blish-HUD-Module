@@ -10,10 +10,17 @@
 
 1. Ensure you have the latest version of the Blish HUD project downloaded.
 2. Build the Blish HUD project so that Blish HUD.exe is generated.
-3. Run "nuget restore" in the Package Manager Console to ensure all NuGet packages are restored. ![NuGet Restore](docs/NuGetRestore.png)
-3. Add a reference to your module project to the new Blish HUD.exe (usually `C:\Users\username\Source\Repos\BlishHUD\Blish HUD\bin\x64\Debug\Blish HUD.exe`).
-4. In your module's **Debug** settings, set the **Start action** to *Start external program:* with the same path used as a reference in step 3.
-5. In the same settings, under *Start options* set *Working directory:* to the folder that contains the executable referenced in steps 3 and 4. ![Debug Settings](docs/DebugSettings.png)
+3. Run `nuget restore` in the Package Manager Console to ensure all NuGet packages are restored. ![NuGet Restore](docs/NuGetRestore.png)
+4. Add a reference to your module project to the new Blish HUD.exe (usually `C:\Users\username\Source\Repos\BlishHUD\Blish HUD\bin\x64\Debug\Blish HUD.exe`).
+5. In your module's **Debug** settings, set the **Start action** to *Start external program:* with the same path used as a reference in step 3.
+6. In the same settings, under *Start options* set *Working directory:* to the folder that contains the executable referenced in steps 3 and 4. ![Debug Settings](docs/DebugSettings.png)
+
+### Update Manifest
+
+1. Most importantly, ensure that the "package" attribute in your *manifest.json* matches your projects assembly name.  If this is not done, your module will fail to enable.
+2. Review the manifest format (currently v1) here: https://github.com/blish-hud/manifest.json/blob/master/manifest-v1.md
+
+If you have problems getting the "package" attribute correct, open your module's .bhm with a utility such as 7-Zip and check to see what the compiled .dll file is named inside of it.  This is what the value of your "package" attribute should be set to.
 
 ### Workflow Option 1 (Recommended)
 
