@@ -1,6 +1,6 @@
 {
   "name": "Example Module",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "namespace": "bh.example.examplemodule",
   "package": "ExampleBHUDModule.dll",
   "manifest_version": 1,
@@ -16,8 +16,8 @@
   },
   "contributors": [
     {
-      "name": "Freesnöw",
-      "username": "LandersXanders.1235"
+      "name": "Freesnöw1",
+      "username": "LandersXanders1.1235"
     },
     {
       "name": "Freesnöw2",
