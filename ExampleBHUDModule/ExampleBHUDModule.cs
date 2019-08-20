@@ -24,7 +24,7 @@ namespace ExampleBHUDModule {
         /// Other classes can have their own logger.  Instance those loggers the same as you have
         /// here, but with their type as the argument.
         /// </summary>
-        private static Logger Logger = Logger.GetLogger(typeof(ExampleBHUDModule));
+        private static readonly Logger Logger = Logger.GetLogger(typeof(ExampleBHUDModule));
 
         internal static ExampleBHUDModule ModuleInstance;
 
