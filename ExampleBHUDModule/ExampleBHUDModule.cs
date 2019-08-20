@@ -8,14 +8,31 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Blish_HUD.Input;
 
 namespace ExampleBHUDModule {
 
     [Export(typeof(Module))]
     public class ExampleBHUDModule : Module {
+
+        /// <summary>
+        /// This is your logger for writing to the log.  Ensure the type of of your module class.
+        /// Other classes can have their own logger.  Instance those loggers the same as you have
+        /// here, but with their type as the argument.
+        /// </summary>
+        private static Logger Logger = Logger.GetLogger(typeof(ExampleBHUDModule));
+
+        internal static ExampleBHUDModule ModuleInstance;
+
+        // Service Managers
+        internal SettingsManager    SettingsManager    => this.ModuleParameters.SettingsManager;
+        internal ContentsManager    ContentsManager    => this.ModuleParameters.ContentsManager;
+        internal DirectoriesManager DirectoriesManager => this.ModuleParameters.DirectoriesManager;
+        internal Gw2ApiManager      Gw2ApiManager      => this.ModuleParameters.Gw2ApiManager;
 
         private Texture2D     _mugTexture;
         private double        _runningTime = 0;
@@ -32,7 +49,9 @@ namespace ExampleBHUDModule {
         /// Use <see cref="Initialize"/> to handle initializing the module.
         /// </summary>
         [ImportingConstructor]
-        public ExampleBHUDModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { /* NOOP */ }
+        public ExampleBHUDModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) {
+            ModuleInstance = this;
+        }
 
         /// <summary>
         /// Define the settings you would like to use in your module.  Settings are persistent
@@ -60,7 +79,7 @@ namespace ExampleBHUDModule {
         /// <see cref="Blish_HUD.Entities.Entity"/> and <see cref="Blish_HUD.Controls.Control"/>.
         /// Setting their parent is not thread-safe and can cause the application to crash.
         /// You will want to queue them to add later while on the main thread or in a delegate queued
-        /// with <see cref="Blish_HUD.DirectorService.QueueMainThreadUpdate(Action{GameTime})"/>.
+        /// with <see cref="Blish_HUD.OverlayService.QueueMainThreadUpdate(Action{GameTime})"/>.
         /// </summary>
         protected override async Task LoadAsync() {
             // Load content from the ref directory automatically with the ContentsManager
@@ -80,15 +99,15 @@ namespace ExampleBHUDModule {
 
                 var allFiles = Directory.EnumerateFiles(fullDirectoryPath, "*", SearchOption.AllDirectories).ToList();
 
-                Console.WriteLine($"'{directoryName}' can be found at '{fullDirectoryPath}' and has {allFiles.Count} total files within it.");
+                Logger.Info($"'{directoryName}' can be found at '{fullDirectoryPath}' and has {allFiles.Count} total files within it.");
             }
         }
 
         /// <summary>
         /// Allows you to perform an action once your module has finished loading (once
         /// <see cref="LoadAsync"/> has completed).  You must call "base.OnModuleLoaded(e)" at the
-        /// end for the <see cref="ExternalModule.ModuleLoaded"/> event to fire and for
-        /// <see cref="ExternalModule.Loaded" /> to update correctly.
+        /// end for the <see cref="Module.ModuleLoaded"/> event to fire and for
+        /// <see cref="Module.Loaded" /> to update correctly.
         /// </summary>
         protected override void OnModuleLoaded(EventArgs e) {
             // Add a mug icon in the top left next to the other icons
@@ -147,6 +166,10 @@ namespace ExampleBHUDModule {
         protected override void Unload() {
             _exampleIcon.Dispose();
             _dungeonContextMenuStrip.Dispose();
+
+            // Static members are not automatically cleared and will keep a reference to your,
+            // module unless manually unset.
+            ModuleInstance = null;
         }
 
     }
