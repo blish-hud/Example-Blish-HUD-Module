@@ -1,37 +1,33 @@
 {
   "name": "Example Module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "namespace": "bh.example.examplemodule",
   "package": "ExampleBHUDModule.dll",
   "manifest_version": 1,
 
   "description": "Acts as an example on how to create a Blish HUD module.",
   "dependencies": {
-    "bh.general.markersandpaths": ">=0.1.2"
+    "bh.blishhud": ">=0.11.7"
   },
   "url": "https://github.com/blish-hud/Blish-HUD",
-  "author": {
-    "name": "Freesnöw",
-    "username": "LandersXanders.1235"
-  },
   "contributors": [
     {
-      "name": "Freesnöw1",
-      "username": "LandersXanders1.1235"
+      "name": "Me",
+      "username": "Gw2AccountName.1234"
     },
     {
-      "name": "Freesnöw2",
-      "username": "LandersXanders2.1235"
+      "name": "Myself",
+      "username": "Gw2AccountName2.1234"
     }
   ],
 
   "directories": [ "markers" ],
-
   "enabled_without_gw2": false,
+
   "api_permissions": {
     "account": {
       "optional": true,
-      "details": "Needed if you want the special feature enabled."
+      "details": "This will be shown as tooltip in the module settings for the api permissions"
     },
     "inventories": {
       "optional": true,
