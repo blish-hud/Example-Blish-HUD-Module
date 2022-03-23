@@ -146,7 +146,10 @@ namespace ExampleBHUDModule
             // the api key from blish hud. Because of that it is best practice to call .HasPermissions before every api request which requires an api key
             // and not only rely on Gw2ApiManager.SubtokenUpdated 
             if (Gw2ApiManager.HasPermissions(Gw2ApiManager.Permissions) == false)
+            {
                 _mySecondLabel.Text = "api permissions are missing";
+                return;
+            }
 
             // even when the api request and api subToken are okay, the api requests can still fail for various reasons.
             // Examples are timeouts or the api is down or the api randomly responds with an error code instead of the correct response.
