@@ -197,11 +197,11 @@ namespace ExampleBHUDModule
 
             // Load content from the ref directory in the module.bhm automatically with the ContentsManager
             _mugTexture       = ContentsManager.GetTexture("603447.png");
-            _windowBackground = ContentsManager.GetTexture("155985.png");
+            _windowBackgroundTexture = ContentsManager.GetTexture("155985.png");
 
             // show a window with gw2 window style.
-            var exampleWindow = new StandardWindow(
-                _windowBackground,
+            _exampleWindow = new StandardWindow(
+                _windowBackgroundTexture,
                 new Rectangle(40, 26, 913, 691),
                 new Rectangle(70, 71, 839, 605))
             {
@@ -215,7 +215,7 @@ namespace ExampleBHUDModule
             };
 
             // show blish hud overlay settings content inside the window
-            exampleWindow.Show(new OverlaySettingsView());
+            _exampleWindow.Show(new OverlaySettingsView());
         }
 
         // Allows you to perform an action once your module has finished loading (once
@@ -280,8 +280,12 @@ namespace ExampleBHUDModule
         {
             Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated; 
 
-            _exampleCornerIcon.Dispose();
-            _dungeonContextMenuStrip.Dispose();
+            _exampleCornerIcon?.Dispose();
+            _dungeonContextMenuStrip?.Dispose();
+            _mySimpleWindowContainer?.Dispose(); // this will dispose the child labels we added as well
+            _exampleWindow?.Dispose();
+            _windowBackgroundTexture?.Dispose();
+            _mugTexture?.Dispose();
 
             // All static members must be manually unset
             // Static members are not automatically cleared and will keep a reference to your,
@@ -297,7 +301,7 @@ namespace ExampleBHUDModule
         private SettingCollection _internalExampleSettingSubCollection;
         private SettingEntry<int> _hiddenIntExampleSetting;
         private SettingEntry<int> _hiddenIntExampleSetting2;
-        private Texture2D _windowBackground;
+        private Texture2D _windowBackgroundTexture;
         private Texture2D _mugTexture;
         private List<Dungeon> _dungeons;
         private CornerIcon _exampleCornerIcon;
@@ -306,5 +310,6 @@ namespace ExampleBHUDModule
         private Label _myFirstLabel;
         private Label _mySecondLabel;
         private MyContainer _mySimpleWindowContainer;
+        private StandardWindow _exampleWindow;
     }
 }
