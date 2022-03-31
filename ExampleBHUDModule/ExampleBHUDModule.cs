@@ -138,44 +138,17 @@ namespace ExampleBHUDModule
         // when the user adds a new API key.
         private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
         {
-            // check if api subToken has the permissions you need for your request: Gw2ApiManager.HasPermissions() 
-            // Make sure that you added the api key permissions you need in the manifest.json.
-            // e.g. the api request further down in this code needs the "characters" permission.
-            // You can get the api permissions inside the manifest.json with Gw2ApiManager.Permissions
-            // if the Gw2ApiManager.HasPermissions returns false it can also mean, that your module did not get the api subtoken yet or the user removed
-            // the api key from blish hud. Because of that it is best practice to call .HasPermissions before every api request which requires an api key
-            // and not only rely on Gw2ApiManager.SubtokenUpdated 
-            if (Gw2ApiManager.HasPermissions(Gw2ApiManager.Permissions) == false)
-            {
-                _mySecondLabel.Text = "api permissions are missing";
-                return;
-            }
-
-            // even when the api request and api subToken are okay, the api requests can still fail for various reasons.
-            // Examples are timeouts or the api is down or the api randomly responds with an error code instead of the correct response.
-            // Because of that use try catch when doing api requests to catch api request exceptions.
-            // otherwise api request exceptions can crash your module and blish hud.
-            try
-            {
-                // request characters endpoint from api. 
-                var charactersResponse = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
-                // extract character names from the api response and show them inside a label
-                var characterNames     = charactersResponse.Select(c => c.Name);
-                var characterNamesText = string.Join("\n", characterNames);
-                _mySecondLabel.Text = characterNamesText;
-            }
-            catch (Exception)
-            {
-                // this is just an example for logging.
-                // You do not have to log api response exception. Just make sure that your module has no issue with failing api requests
-                Logger.Info($"Failed to get character names from api."); 
-            }
+            await GetCharacterNamesFromApiAndShowThemInLabel();
         }
-
+        
         // Load content and more here. This call is asynchronous, so it is a good time to run
         // any long running steps for your module including loading resources from file or ref.
         protected override async Task LoadAsync()
         {
+            // usually the api subtoken is not available when the module is loaded. But in case it already is,
+            // we try to receive the character names from the api here.
+            await GetCharacterNamesFromApiAndShowThemInLabel();
+
             try
             {
                 // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
@@ -299,6 +272,42 @@ namespace ExampleBHUDModule
             // Static members are not automatically cleared and will keep a reference to your,
             // module unless manually unset.
             ModuleInstance = null;
+        }
+
+        private async Task GetCharacterNamesFromApiAndShowThemInLabel()
+        {
+            // check if api subToken has the permissions you need for your request: Gw2ApiManager.HasPermissions() 
+            // Make sure that you added the api key permissions you need in the manifest.json.
+            // e.g. the api request further down in this code needs the "characters" permission.
+            // You can get the api permissions inside the manifest.json with Gw2ApiManager.Permissions
+            // if the Gw2ApiManager.HasPermissions returns false it can also mean, that your module did not get the api subtoken yet or the user removed
+            // the api key from blish hud. Because of that it is best practice to call .HasPermissions before every api request which requires an api key
+            // and not only rely on Gw2ApiManager.SubtokenUpdated 
+            if (Gw2ApiManager.HasPermissions(Gw2ApiManager.Permissions) == false)
+            {
+                _mySecondLabel.Text = "api permissions are missing or api sub token not available yet";
+                return;
+            }
+
+            // even when the api request and api subToken are okay, the api requests can still fail for various reasons.
+            // Examples are timeouts or the api is down or the api randomly responds with an error code instead of the correct response.
+            // Because of that use try catch when doing api requests to catch api request exceptions.
+            // otherwise api request exceptions can crash your module and blish hud.
+            try
+            {
+                // request characters endpoint from api. 
+                var charactersResponse = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
+                // extract character names from the api response and show them inside a label
+                var characterNames = charactersResponse.Select(c => c.Name);
+                var characterNamesText = string.Join("\n", characterNames);
+                _mySecondLabel.Text = characterNamesText;
+            }
+            catch (Exception e)
+            {
+                // this is just an example for logging.
+                // You do not have to log api response exception. Just make sure that your module has no issue with failing api requests
+                Logger.Info($"Failed to get character names from api.");
+            }
         }
 
         internal static ExampleBHUDModule ModuleInstance;
