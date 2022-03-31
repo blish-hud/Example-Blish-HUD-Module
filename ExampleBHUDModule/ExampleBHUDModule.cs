@@ -176,10 +176,18 @@ namespace ExampleBHUDModule
         // any long running steps for your module including loading resources from file or ref.
         protected override async Task LoadAsync()
         {
-            // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
-            // Because of that it is not necessary to check for api key permissions in this case
-            var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
-            _dungeons = dungeonRequest.ToList();
+            try
+            {
+                // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
+                // Because of that it is not necessary to check for api key permissions in this case or for the api subtoken to be available.
+                var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
+                _dungeons.Clear();
+                _dungeons.AddRange(dungeonRequest.ToList());
+            }
+            catch (Exception e)
+            {
+                Logger.Info($"Failed to get dungeons from api.");
+            }
 
             // If you really need to, you can recall your settings values with the SettingsManager
             // It is better if you just hold onto the returned "TypeEntry" instance when doing your initial DefineSetting, though
@@ -303,7 +311,7 @@ namespace ExampleBHUDModule
         private SettingEntry<int> _hiddenIntExampleSetting2;
         private Texture2D _windowBackgroundTexture;
         private Texture2D _mugTexture;
-        private List<Dungeon> _dungeons;
+        private List<Dungeon> _dungeons = new List<Dungeon>();
         private CornerIcon _exampleCornerIcon;
         private ContextMenuStrip _dungeonContextMenuStrip;
         private double _runningTime;
