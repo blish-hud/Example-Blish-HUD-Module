@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{71347BB8-D1B0-450D-84B2-48F7D5A35993}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ExampleBHUDModule</RootNamespace>
-    <AssemblyName>ExampleBHUDModule</AssemblyName>
+    <RootNamespace>ExampleBlishhudModule</RootNamespace>
+    <AssemblyName>ExampleBlishhudModule</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -64,7 +64,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExampleBHUDModule.cs" />
+    <Compile Include="ExampleModule.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="MyContainer.cs" />
   </ItemGroup>

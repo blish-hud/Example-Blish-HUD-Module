@@ -2,7 +2,7 @@
   "name": "Example Module",
   "version": "0.3.0",
   "namespace": "bh.example.examplemodule",
-  "package": "ExampleBHUDModule.dll",
+  "package": "ExampleBlishhudModule.dll",
   "manifest_version": 1,
 
   "description": "Acts as an example on how to create a Blish HUD module.",

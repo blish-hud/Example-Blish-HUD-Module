@@ -1,6 +1,6 @@
 ﻿using Blish_HUD.Controls;
 
-namespace ExampleBHUDModule
+namespace ExampleBlishhudModule
 {
     public class MyContainer : Container
     {

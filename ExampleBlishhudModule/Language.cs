@@ -1,4 +1,4 @@
-﻿namespace ExampleBHUDModule
+﻿namespace ExampleBlishhudModule
 {
     public enum Language
     {
