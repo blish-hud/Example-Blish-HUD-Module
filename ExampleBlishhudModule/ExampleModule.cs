@@ -1,28 +1,28 @@
-﻿using Blish_HUD;
-using Blish_HUD.Modules;
-using Blish_HUD.Modules.Managers;
-using Blish_HUD.Settings;
-using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Modules;
+using Blish_HUD.Modules.Managers;
 using Blish_HUD.Overlay.UI.Views;
+using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-namespace ExampleBHUDModule
+namespace ExampleBlishhudModule
 {
     [Export(typeof(Module))]
-    public class ExampleBHUDModule : Module
+    public class ExampleModule : Module
     {
-        private static readonly Logger Logger = Logger.GetLogger<ExampleBHUDModule>();
+        private static readonly Logger Logger = Logger.GetLogger<ExampleModule>();
 
         #region Service Managers
 
@@ -36,9 +36,9 @@ namespace ExampleBHUDModule
         // Ideally you should keep the constructor as is.
         // Use <see cref="Initialize"/> to handle initializing the module.
         [ImportingConstructor]
-        public ExampleBHUDModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters)
+        public ExampleModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters)
         {
-            ModuleInstance = this;
+            ExampleModuleInstance = this;
         }
 
         // Define the settings you would like to use in your module.  Settings are persistent
@@ -192,7 +192,7 @@ namespace ExampleBHUDModule
                 Subtitle      = "Example Subtitle",
                 Location      = new Point(300, 300),
                 SavesPosition = true,
-                Id            = $"{nameof(ExampleBHUDModule)}_My_Unique_ID_123"
+                Id            = $"{nameof(ExampleModule)}_My_Unique_ID_123"
             };
 
             // show blish hud overlay settings content inside the window
@@ -201,7 +201,7 @@ namespace ExampleBHUDModule
 
         // Allows you to perform an action once your module has finished loading (once
         // <see cref="LoadAsync"/> has completed).  You must call "base.OnModuleLoaded(e)" at the
-        // end for the <see cref="Module.ModuleLoaded"/> event to fire.
+        // end for the <see cref="ExampleModule.ModuleLoaded"/> event to fire.
         protected override void OnModuleLoaded(EventArgs e)
         {
             // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
@@ -271,7 +271,7 @@ namespace ExampleBHUDModule
             // All static members must be manually unset
             // Static members are not automatically cleared and will keep a reference to your,
             // module unless manually unset.
-            ModuleInstance = null;
+            ExampleModuleInstance = null;
         }
 
         private async Task GetCharacterNamesFromApiAndShowThemInLabel()
@@ -310,7 +310,7 @@ namespace ExampleBHUDModule
             }
         }
 
-        internal static ExampleBHUDModule ModuleInstance;
+        internal static ExampleModule ExampleModuleInstance;
         private SettingEntry<bool> _boolExampleSetting;
         private SettingEntry<int> _valueRangeExampleSetting;
         private SettingEntry<string> _stringExampleSetting;
