@@ -7,7 +7,7 @@
 
   "description": "Acts as an example on how to create a Blish HUD module.",
   "dependencies": {
-    "bh.blishhud": ">=0.11.7"
+    "bh.blishhud": ">=1.0.0"
   },
   "url": "https://github.com/blish-hud/Blish-HUD",
   "contributors": [
