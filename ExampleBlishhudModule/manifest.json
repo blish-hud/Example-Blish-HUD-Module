@@ -9,11 +9,12 @@
   "dependencies": {
     "bh.blishhud": ">=1.0.0"
   },
-  "url": "https://github.com/blish-hud/Blish-HUD",
+  "url": "https://github.com/blish-hud/Example-Blish-HUD-Module",
   "contributors": [
     {
       "name": "Me",
-      "username": "Gw2AccountName.1234"
+      "username": "Gw2AccountName.1234",
+      "url": "https://github.com/yourGithubPage"
     },
     {
       "name": "Myself",
@@ -26,44 +27,44 @@
 
   "api_permissions": {
     "account": {
-      "optional": true,
-      "details": "This will be shown as tooltip in the module settings for the api permissions"
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "inventories": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "characters": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "tradingpost": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "wallet": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "unlocks": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "pvp": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "builds": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "progression": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     },
     "guilds": {
-      "optional": true,
-      "details": "Needed to review the item in your inventory."
+      "optional": false,
+      "details": "This will be shown as tooltip in the module settings for the api permissions. Explain here to the user why the permission is necessary for your module"
     }
   }
 }
