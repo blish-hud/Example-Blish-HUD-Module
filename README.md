@@ -13,4 +13,4 @@
 6. In the visual studio menu bar click on the dropdown next to the green arrow. Select "gw2" or "powershell" depending on what blish should overlay.
 7. Press the green arrow to start blish with the example module in debug mode. It will overlay Guild Wars 2 or the powershell window depending on what you picked in the previous steps.
 
-Additional infos for debugging: https://blishhud.com/docs/modules/overview/debugging ![Debug Settings]
+Additional infos for debugging: https://blishhud.com/docs/modules/overview/debugging
