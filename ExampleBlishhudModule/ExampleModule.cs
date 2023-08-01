@@ -38,6 +38,14 @@ namespace ExampleBlishhudModule
         [ImportingConstructor]
         public ExampleModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters)
         {
+            // Static fields:
+            // static fields like ExampleModuleInstance can be used as global variables in your module.
+            // E.g. some module devs use them to be able to access their module settings everywhere.
+            // Just be aware, that you MUST clear static fields in Module.Unload() by setting them to null.
+            // In this case ExampleModuleInstance is not a big deal because it is set in the module constructor. But if you set static fields 
+            // in different places, you will run into issues because they keep their state even when your module is disabled and enabled again
+            // or updated. This can lead to bugs that are hard to fix. In general, static fields should be avoided whenever possible.
+            // If you dont want to use it, you can remove this static field.
             ExampleModuleInstance = this;
         }
 
