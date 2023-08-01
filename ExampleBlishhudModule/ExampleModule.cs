@@ -163,7 +163,8 @@ namespace ExampleBlishhudModule
                 Subtitle      = "Example Subtitle",
                 Location      = new Point(300, 300),
                 SavesPosition = true,
-                Id            = $"{nameof(ExampleModule)}_My_Unique_ID_123"
+                // Id has to be unique not only in your module but also within blish core and any other module
+                Id = $"{nameof(ExampleModule)}_My_Unique_ID_123" 
             };
 
             // show blish hud overlay settings content inside the window
@@ -174,6 +175,12 @@ namespace ExampleBlishhudModule
             {
                 Icon             = _mugTexture,
                 BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
+                // Priority determines the position relative to cornerIcons of other modules
+                // because of that it MUST be set to a constant random value.
+                // Do not recalculate this value on every module start up. Just use a constant value.
+                // It has to be random to prevent that two modules use the same priority (e.g. "4") which would cause the cornerIcons to be in 
+                // a different position on every startup.
+                Priority         = 1645843523, 
                 Parent           = GameService.Graphics.SpriteScreen
             };
 
