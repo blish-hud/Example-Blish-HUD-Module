@@ -115,14 +115,14 @@ namespace ExampleBlishhudModule
         {
             Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
 
-            // show a simple window with 2 labels
-            _mySimpleWindowContainer = new MyContainer()
+            _myFlowPanel = new FlowPanel()
             {
-                BackgroundColor  = Color.Black,
+                BackgroundColor = Color.Black,
+                FlowDirection = ControlFlowDirection.SingleTopToBottom,
+                WidthSizingMode = SizingMode.AutoSize,
                 HeightSizingMode = SizingMode.AutoSize,
-                WidthSizingMode  = SizingMode.AutoSize,
-                Location         = new Point(200, 200),
-                Parent           = GameService.Graphics.SpriteScreen
+                Location = new Point(200, 200),
+                Parent = GameService.Graphics.SpriteScreen,
             };
 
             _myFirstLabel = new Label() // this label is used as heading
@@ -133,8 +133,8 @@ namespace ExampleBlishhudModule
                 ShowShadow     = true,
                 AutoSizeHeight = true,
                 AutoSizeWidth  = true,
-                Location       = new Point(2, 0),
-                Parent         = _mySimpleWindowContainer
+                //Location     = new Point(2, 0), // without a FlowPanel as parent, you can set the exact position inside the parent this way
+                Parent         = _myFlowPanel
             };
 
             _mySecondLabel = new Label() // this label will be used to display the character names requested from the API
@@ -145,8 +145,8 @@ namespace ExampleBlishhudModule
                 ShowShadow     = true,
                 AutoSizeHeight = true,
                 AutoSizeWidth  = true,
-                Location       = new Point(2, 50),
-                Parent         = _mySimpleWindowContainer
+                //Location     = new Point(2, 50), // without a FlowPanel as parent, you can set the exact position inside the parent this way
+                Parent         = _myFlowPanel
             };
 
             // usually the api subtoken is not available when the module is loaded. But in case it already is,
@@ -267,7 +267,7 @@ namespace ExampleBlishhudModule
             // This can be done by using if null checks or by using the null-condition operator ?. (question mark with dot).
             _exampleCornerIcon?.Dispose();
             _dungeonContextMenuStrip?.Dispose();
-            _mySimpleWindowContainer?.Dispose(); // this will dispose the child labels we added as well
+            _myFlowPanel?.Dispose(); // this will dispose the child labels we added as well
             _exampleWindow?.Dispose();
             _windowBackgroundTexture?.Dispose();
             _mugTexture?.Dispose();
@@ -330,7 +330,7 @@ namespace ExampleBlishhudModule
         private double _runningTime;
         private Label _myFirstLabel;
         private Label _mySecondLabel;
-        private MyContainer _mySimpleWindowContainer;
+        private FlowPanel _myFlowPanel;
         private StandardWindow _exampleWindow;
     }
 }
