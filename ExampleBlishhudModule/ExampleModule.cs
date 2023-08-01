@@ -262,6 +262,9 @@ namespace ExampleBlishhudModule
             // still responds to events and is messing with your module.
             Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated; 
 
+            // Unload() can be called on your module anytime. Even while it is currently loading and creating the objects.
+            // Because of that you always have to check if the objects you want to access in Unload() are not null.
+            // This can be done by using if null checks or by using the null-condition operator ?. (question mark with dot).
             _exampleCornerIcon?.Dispose();
             _dungeonContextMenuStrip?.Dispose();
             _mySimpleWindowContainer?.Dispose(); // this will dispose the child labels we added as well
