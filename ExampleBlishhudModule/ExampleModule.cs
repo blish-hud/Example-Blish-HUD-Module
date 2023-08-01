@@ -34,7 +34,7 @@ namespace ExampleBlishhudModule
         #endregion
 
         // Ideally you should keep the constructor as is.
-        // Use <see cref="Initialize"/> to handle initializing the module.
+        // Use LoadAsync() to handle initializing the module.
         [ImportingConstructor]
         public ExampleModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters)
         {
