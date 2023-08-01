@@ -234,7 +234,7 @@ namespace ExampleBlishhudModule
             // This can be done by using if null checks or by using the null-condition operator ?. (question mark with dot).
             _exampleCornerIcon?.Dispose();
             _dungeonContextMenuStrip?.Dispose();
-            _myFlowPanel?.Dispose(); // this will dispose the child labels we added as well
+            _charactersFlowPanel?.Dispose(); // this will dispose the child labels we added as well
             _exampleWindow?.Dispose();
             _windowBackgroundTexture?.Dispose();
             _mugTexture?.Dispose();
@@ -247,7 +247,7 @@ namespace ExampleBlishhudModule
 
         private void createCharacterNamesWindow()
         {
-            _myFlowPanel = new FlowPanel()
+            _charactersFlowPanel = new FlowPanel()
             {
                 BackgroundColor = Color.Black,
                 FlowDirection = ControlFlowDirection.SingleTopToBottom,
@@ -257,7 +257,7 @@ namespace ExampleBlishhudModule
                 Parent = GameService.Graphics.SpriteScreen,
             };
 
-            _myFirstLabel = new Label() // this label is used as heading
+            _charactersHeaderLabel = new Label() // this label is used as heading
             {
                 Text = "My Characters:",
                 TextColor = Color.Red,
@@ -266,10 +266,10 @@ namespace ExampleBlishhudModule
                 AutoSizeHeight = true,
                 AutoSizeWidth = true,
                 //Location     = new Point(2, 0), // without a FlowPanel as parent, you can set the exact position inside the parent this way
-                Parent = _myFlowPanel
+                Parent = _charactersFlowPanel
             };
 
-            _mySecondLabel = new Label() // this label will be used to display the character names requested from the API
+            _characterNamesLabel = new Label() // this label will be used to display the character names requested from the API
             {
                 Text = "getting data from api...",
                 TextColor = Color.DarkGray,
@@ -278,7 +278,7 @@ namespace ExampleBlishhudModule
                 AutoSizeHeight = true,
                 AutoSizeWidth = true,
                 //Location     = new Point(2, 50), // without a FlowPanel as parent, you can set the exact position inside the parent this way
-                Parent = _myFlowPanel
+                Parent = _charactersFlowPanel
             };
         }
 
@@ -286,20 +286,25 @@ namespace ExampleBlishhudModule
         {
             // check if api subToken has the permissions you need for your request: Gw2ApiManager.HasPermissions() 
             // Make sure that you added the api key permissions you need in the manifest.json.
+            // Don't set them to '"optional": false' if you dont plan to handle that case.
             // e.g. the api request further down in this code needs the "characters" permission.
-            // You can get the api permissions inside the manifest.json with Gw2ApiManager.Permissions
             // if the Gw2ApiManager.HasPermissions returns false it can also mean, that your module did not get the api subtoken yet or the user removed
             // the api key from blish hud. Because of that it is best practice to call .HasPermissions before every api request which requires an api key
-            // and not only rely on Gw2ApiManager.SubtokenUpdated 
-            if (Gw2ApiManager.HasPermissions(Gw2ApiManager.Permissions) == false)
+            var apiKeyPermissions = new List<TokenPermission>
             {
-                _mySecondLabel.Text = "api permissions are missing or api sub token not available yet";
+                TokenPermission.Account, // this permission can be used to check if your module got a token at all because every api key has it.
+                TokenPermission.Characters
+            };
+
+            if (!Gw2ApiManager.HasPermissions(apiKeyPermissions))
+            {
+                _characterNamesLabel.Text = "api permissions are missing or api sub token not available yet";
                 return;
             }
 
             // even when the api request and api subToken are okay, the api requests can still fail for various reasons.
             // Examples are timeouts or the api is down or the api randomly responds with an error code instead of the correct response.
-            // Because of that use try catch when doing api requests to catch api request exceptions.
+            // Because of that always use try catch when doing api requests to catch api request exceptions.
             // otherwise api request exceptions can crash your module and blish hud.
             try
             {
@@ -308,12 +313,17 @@ namespace ExampleBlishhudModule
                 // extract character names from the api response and show them inside a label
                 var characterNames = charactersResponse.Select(c => c.Name);
                 var characterNamesText = string.Join("\n", characterNames);
-                _mySecondLabel.Text = characterNamesText;
+                _characterNamesLabel.Text = characterNamesText;
             }
             catch (Exception e)
             {
                 // this is just an example for logging.
-                // You do not have to log api response exception. Just make sure that your module has no issue with failing api requests
+                // You do not have to log api response exceptions. Just make sure that your module has no issue with failing api requests.
+                // Warning:
+                // Blish Hud uses the tool Sentry in combination with the ErrorSubmissionModule to register ERROR and FATAL log entries.
+                // Because of that you must not use Logger.Error() or .Fatal() to log api response exceptions. Because sometimes the GW2 api
+                // can be down for up to a few days. That triggers a lot of api exceptions which would end up spamming the Sentry tool.
+                // Instead use Logger.Info() or .Warn() if you want to log api response errors. Those do not get stored by the Sentry tool.
                 Logger.Info($"Failed to get character names from api.");
             }
         }
@@ -332,9 +342,9 @@ namespace ExampleBlishhudModule
         private CornerIcon _exampleCornerIcon;
         private ContextMenuStrip _dungeonContextMenuStrip;
         private double _runningTime;
-        private Label _myFirstLabel;
-        private Label _mySecondLabel;
-        private FlowPanel _myFlowPanel;
+        private Label _charactersHeaderLabel;
+        private Label _characterNamesLabel;
+        private FlowPanel _charactersFlowPanel;
         private StandardWindow _exampleWindow;
     }
 }
