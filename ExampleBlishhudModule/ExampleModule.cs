@@ -267,6 +267,12 @@ namespace ExampleBlishhudModule
         // Be sure to remove any tabs added to the Director window, CornerIcons, etc.
         protected override void Unload()
         {
+            // it is best practise to unsubscribe from events. That is typically done inside of .Dispose() or Module.Unload().
+            // Unsubscribing only works if you subscribed with a named method (e.g. += MyMethod;).
+            // It doesnt work with lambda expressions (e.g. += () => 2+2;)
+            // Not unsubscribing from events can result in the event subscriber (right side) being kept alive by the event publisher (left side).
+            // This can lead to memory leaks and bugs where an object, that shouldnt exist aynmore,
+            // still responds to events and is messing with your module.
             Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated; 
 
             _exampleCornerIcon?.Dispose();
