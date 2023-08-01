@@ -81,9 +81,11 @@ namespace ExampleBlishhudModule
             _valueRangeExampleSetting.SetRange(0, 255); // for min and max range of the setting
 
             _enumExampleSetting = settings.DefineSetting("enum example",
-                Language.English,
+                ColorType.Blue,
                 () => "This is an enum setting (drop down menu)",
                 () => "...");
+
+            _enumExampleSetting.SettingChanged += UpdateCharacterWindowColor;
 
             // you can get or set the setting value somewhere else in your module with the .Value property like this:
             _boolExampleSetting.Value = false;
@@ -93,6 +95,14 @@ namespace ExampleBlishhudModule
             _internalExampleSettingSubCollection = settings.AddSubCollection("internal settings (not visible in UI)");
             _hiddenIntExampleSetting = _internalExampleSettingSubCollection.DefineSetting("example window x position", 50);
             _hiddenIntExampleSetting2 = _internalExampleSettingSubCollection.DefineSetting("example window y position", 50);
+        }
+
+        private void UpdateCharacterWindowColor(object sender, ValueChangedEventArgs<ColorType> e)
+        {
+            if (_enumExampleSetting.Value == ColorType.Black)
+                _charactersFlowPanel.BackgroundColor = Color.Black;
+            else
+                _charactersFlowPanel.BackgroundColor = Color.Blue;
         }
 
         // Some API requests need an api key. e.g. accessing account data like inventory or bank content
@@ -234,7 +244,8 @@ namespace ExampleBlishhudModule
             // Not unsubscribing from events can result in the event subscriber (right side) being kept alive by the event publisher (left side).
             // This can lead to memory leaks and bugs where an object, that shouldnt exist aynmore,
             // still responds to events and is messing with your module.
-            Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated; 
+            Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated;
+            _enumExampleSetting.SettingChanged -= UpdateCharacterWindowColor;
 
             // Unload() can be called on your module anytime. Even while it is currently loading and creating the objects.
             // Because of that you always have to check if the objects you want to access in Unload() are not null.
@@ -256,7 +267,7 @@ namespace ExampleBlishhudModule
         {
             _charactersFlowPanel = new FlowPanel()
             {
-                BackgroundColor = Color.Black,
+                BackgroundColor = _enumExampleSetting.Value == ColorType.Black ? Color.Black : Color.Blue,
                 FlowDirection = ControlFlowDirection.SingleTopToBottom,
                 WidthSizingMode = SizingMode.AutoSize,
                 HeightSizingMode = SizingMode.AutoSize,
@@ -339,7 +350,7 @@ namespace ExampleBlishhudModule
         private SettingEntry<bool> _boolExampleSetting;
         private SettingEntry<int> _valueRangeExampleSetting;
         private SettingEntry<string> _stringExampleSetting;
-        private SettingEntry<Language> _enumExampleSetting;
+        private SettingEntry<ColorType> _enumExampleSetting;
         private SettingCollection _internalExampleSettingSubCollection;
         private SettingEntry<int> _hiddenIntExampleSetting;
         private SettingEntry<int> _hiddenIntExampleSetting2;
