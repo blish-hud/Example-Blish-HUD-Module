@@ -114,40 +114,7 @@ namespace ExampleBlishhudModule
         protected override async Task LoadAsync()
         {
             Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
-
-            _myFlowPanel = new FlowPanel()
-            {
-                BackgroundColor = Color.Black,
-                FlowDirection = ControlFlowDirection.SingleTopToBottom,
-                WidthSizingMode = SizingMode.AutoSize,
-                HeightSizingMode = SizingMode.AutoSize,
-                Location = new Point(200, 200),
-                Parent = GameService.Graphics.SpriteScreen,
-            };
-
-            _myFirstLabel = new Label() // this label is used as heading
-            {
-                Text           = "My Characters:",
-                TextColor      = Color.Red,
-                Font           = GameService.Content.DefaultFont32,
-                ShowShadow     = true,
-                AutoSizeHeight = true,
-                AutoSizeWidth  = true,
-                //Location     = new Point(2, 0), // without a FlowPanel as parent, you can set the exact position inside the parent this way
-                Parent         = _myFlowPanel
-            };
-
-            _mySecondLabel = new Label() // this label will be used to display the character names requested from the API
-            {
-                Text           = "getting data from api...", 
-                TextColor      = Color.DarkGray,
-                Font           = GameService.Content.DefaultFont32,
-                ShowShadow     = true,
-                AutoSizeHeight = true,
-                AutoSizeWidth  = true,
-                //Location     = new Point(2, 50), // without a FlowPanel as parent, you can set the exact position inside the parent this way
-                Parent         = _myFlowPanel
-            };
+            createCharacterNamesWindow();
 
             // usually the api subtoken is not available when the module is loaded. But in case it already is,
             // we try to receive the character names from the api here.
@@ -276,6 +243,43 @@ namespace ExampleBlishhudModule
             // Static members are not automatically cleared and will keep a reference to your,
             // module unless manually unset.
             ExampleModuleInstance = null;
+        }
+
+        private void createCharacterNamesWindow()
+        {
+            _myFlowPanel = new FlowPanel()
+            {
+                BackgroundColor = Color.Black,
+                FlowDirection = ControlFlowDirection.SingleTopToBottom,
+                WidthSizingMode = SizingMode.AutoSize,
+                HeightSizingMode = SizingMode.AutoSize,
+                Location = new Point(200, 200),
+                Parent = GameService.Graphics.SpriteScreen,
+            };
+
+            _myFirstLabel = new Label() // this label is used as heading
+            {
+                Text = "My Characters:",
+                TextColor = Color.Red,
+                Font = GameService.Content.DefaultFont32,
+                ShowShadow = true,
+                AutoSizeHeight = true,
+                AutoSizeWidth = true,
+                //Location     = new Point(2, 0), // without a FlowPanel as parent, you can set the exact position inside the parent this way
+                Parent = _myFlowPanel
+            };
+
+            _mySecondLabel = new Label() // this label will be used to display the character names requested from the API
+            {
+                Text = "getting data from api...",
+                TextColor = Color.DarkGray,
+                Font = GameService.Content.DefaultFont32,
+                ShowShadow = true,
+                AutoSizeHeight = true,
+                AutoSizeWidth = true,
+                //Location     = new Point(2, 50), // without a FlowPanel as parent, you can set the exact position inside the parent this way
+                Parent = _myFlowPanel
+            };
         }
 
         private async Task GetCharacterNamesFromApiAndShowThemInLabel()
