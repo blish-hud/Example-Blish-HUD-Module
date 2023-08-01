@@ -95,10 +95,23 @@ namespace ExampleBlishhudModule
             _hiddenIntExampleSetting2 = _internalExampleSettingSubCollection.DefineSetting("example window y position", 50);
         }
 
-        // Allows your module to perform any initialization it needs before starting to run.
-        // Please note that Initialize is NOT asynchronous and will block Blish HUD's update
-        // and render loop, so be sure to not do anything here that takes too long.
-        protected override void Initialize()
+        // Some API requests need an api key. e.g. accessing account data like inventory or bank content
+        // Blish hud gives you an api subToken you can use instead of the real api key the user entered in blish.
+        // But this api subToken may not be available when your module is loaded.
+        // Because of that api requests, which require an api key, may fail when they are called in Initialize() or LoadAsync().
+        // Or the user can delete the api key or add a new api key with the wrong permissions while your module is already running.
+        // You can react to that by subscribing to Gw2ApiManager.SubtokenUpdated. This event will be raised when your module gets the api subToken or
+        // when the user adds a new API key.
+        private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
+        {
+            await GetCharacterNamesFromApiAndShowThemInLabel();
+        }
+
+        // Load content and more here. This call is asynchronous, so it is a good time to run
+        // any long running steps for your module including loading resources from file or ref.
+        // Use LoadAsync() instead of Initialize(), OnModuleLoaded() and ModuleLoaded event. The latter run synchronously and block the
+        // blish update loop
+        protected override async Task LoadAsync()
         {
             Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
 
@@ -135,24 +148,7 @@ namespace ExampleBlishhudModule
                 Location       = new Point(2, 50),
                 Parent         = _mySimpleWindowContainer
             };
-        }
 
-        // Some API requests need an api key. e.g. accessing account data like inventory or bank content
-        // Blish hud gives you an api subToken you can use instead of the real api key the user entered in blish.
-        // But this api subToken may not be available when your module is loaded.
-        // Because of that api requests, which require an api key, may fail when they are called in Initialize() or LoadAsync().
-        // Or the user can delete the api key or add a new api key with the wrong permissions while your module is already running.
-        // You can react to that by subscribing to Gw2ApiManager.SubtokenUpdated. This event will be raised when your module gets the api subToken or
-        // when the user adds a new API key.
-        private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
-        {
-            await GetCharacterNamesFromApiAndShowThemInLabel();
-        }
-        
-        // Load content and more here. This call is asynchronous, so it is a good time to run
-        // any long running steps for your module including loading resources from file or ref.
-        protected override async Task LoadAsync()
-        {
             // usually the api subtoken is not available when the module is loaded. But in case it already is,
             // we try to receive the character names from the api here.
             await GetCharacterNamesFromApiAndShowThemInLabel();
@@ -205,13 +201,7 @@ namespace ExampleBlishhudModule
 
             // show blish hud overlay settings content inside the window
             _exampleWindow.Show(new OverlaySettingsView());
-        }
 
-        // Allows you to perform an action once your module has finished loading (once
-        // <see cref="LoadAsync"/> has completed).  You must call "base.OnModuleLoaded(e)" at the
-        // end for the <see cref="ExampleModule.ModuleLoaded"/> event to fire.
-        protected override void OnModuleLoaded(EventArgs e)
-        {
             // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
             _exampleCornerIcon = new CornerIcon()
             {
@@ -241,9 +231,6 @@ namespace ExampleBlishhudModule
             }
 
             _exampleCornerIcon.Menu = _dungeonContextMenuStrip;
-
-            // Base handler must be called
-            base.OnModuleLoaded(e);
         }
 
         // Allows your module to run logic such as updating UI elements,
