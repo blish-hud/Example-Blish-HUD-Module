@@ -24,17 +24,12 @@ namespace ExampleBlishhudModule
     {
         private static readonly Logger Logger = Logger.GetLogger<ExampleModule>();
 
-        #region Service Managers
-
         internal SettingsManager SettingsManager => this.ModuleParameters.SettingsManager;
         internal ContentsManager ContentsManager => this.ModuleParameters.ContentsManager;
         internal DirectoriesManager DirectoriesManager => this.ModuleParameters.DirectoriesManager;
         internal Gw2ApiManager Gw2ApiManager => this.ModuleParameters.Gw2ApiManager;
 
-        #endregion
-
-        // Ideally you should keep the constructor as is.
-        // Use LoadAsync() to handle initializing the module.
+        // Ideally you should keep the constructor as is (empty). Instead use LoadAsync() to handle initializing the module.
         [ImportingConstructor]
         public ExampleModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters)
         {
@@ -53,6 +48,9 @@ namespace ExampleBlishhudModule
         // between updates to both Blish HUD and your module.
         protected override void DefineSettings(SettingCollection settings)
         {
+            // The following settings will automatically create controls in the settings panel of your module tab.
+            // If you want to design the settings tab yourself instead of it getting created automatically, you can use this override:
+            // public override IView GetSettingsView() { return new MyCustomSettingsView(); }
             settings.DefineSetting(
                 "ExampleSetting",
                 "This is the default value of the setting",
@@ -80,15 +78,17 @@ namespace ExampleBlishhudModule
 
             _valueRangeExampleSetting.SetRange(0, 255); // for min and max range of the setting
 
-            _enumExampleSetting = settings.DefineSetting("enum example",
+            _enumExampleSetting = settings.DefineSetting(
+                "enum example",
                 ColorType.Blue,
                 () => "This is an enum setting (drop down menu)",
                 () => "...");
 
-            _enumExampleSetting.SettingChanged += UpdateCharacterWindowColor;
-
             // you can get or set the setting value somewhere else in your module with the .Value property like this:
             _boolExampleSetting.Value = false;
+
+            // you can react to a user changing a setting value by subscribing to this event: 
+            _enumExampleSetting.SettingChanged += UpdateCharacterWindowColor;
 
             // internal settings that should not be displayed to the user in the settings window have to be stored in subcollections
             // e.g. saving x,y position of a window
@@ -99,7 +99,7 @@ namespace ExampleBlishhudModule
 
         private void UpdateCharacterWindowColor(object sender, ValueChangedEventArgs<ColorType> e)
         {
-            if (_enumExampleSetting.Value == ColorType.Black)
+            if (_enumExampleSetting.Value == ColorType.Black) // you could use e.NewValue instead of _enumExampleSetting.Value in this case too
                 _charactersFlowPanel.BackgroundColor = Color.Black;
             else
                 _charactersFlowPanel.BackgroundColor = Color.Blue;
@@ -349,11 +349,11 @@ namespace ExampleBlishhudModule
         internal static ExampleModule ExampleModuleInstance;
         private SettingEntry<bool> _boolExampleSetting;
         private SettingEntry<int> _valueRangeExampleSetting;
+        private SettingEntry<int> _hiddenIntExampleSetting;
+        private SettingEntry<int> _hiddenIntExampleSetting2;
         private SettingEntry<string> _stringExampleSetting;
         private SettingEntry<ColorType> _enumExampleSetting;
         private SettingCollection _internalExampleSettingSubCollection;
-        private SettingEntry<int> _hiddenIntExampleSetting;
-        private SettingEntry<int> _hiddenIntExampleSetting2;
         private Texture2D _windowBackgroundTexture;
         private Texture2D _mugTexture;
         private List<Dungeon> _dungeons = new List<Dungeon>();
