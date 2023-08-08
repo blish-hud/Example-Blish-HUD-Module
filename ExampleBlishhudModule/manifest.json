@@ -22,7 +22,7 @@
     }
   ],
 
-  "directories": [ "markers" ],
+  "directories": [ "example-module-data" ],
   "enabled_without_gw2": false,
 
   "api_permissions": {

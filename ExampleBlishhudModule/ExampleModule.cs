@@ -127,11 +127,11 @@ namespace ExampleBlishhudModule
             }
             catch (Exception e)
             {
-                Logger.Info($"Failed to get dungeons from api.");
+                Logger.Info("Failed to get dungeons from api.");
             }
 
-            // Get your manifest registered directories with the DirectoriesManager
-            foreach (string directoryName in this.DirectoriesManager.RegisteredDirectories)
+            // Get your manifest registered directories with the DirectoriesManager. Those can be used to store data.
+            foreach (string directoryName in DirectoriesManager.RegisteredDirectories)
             {
                 string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
                 var allFiles = Directory.EnumerateFiles(fullDirectoryPath, "*", SearchOption.AllDirectories).ToList();
@@ -141,7 +141,7 @@ namespace ExampleBlishhudModule
             }
 
             // Load content from the ref directory in the module.bhm automatically with the ContentsManager
-            _mugTexture       = ContentsManager.GetTexture("603447.png");
+            _mugTexture = ContentsManager.GetTexture("603447.png");
             _windowBackgroundTexture = ContentsManager.GetTexture("155985.png");
 
             // show a window with gw2 window style.
@@ -221,7 +221,7 @@ namespace ExampleBlishhudModule
             {
                 _updateCharactersRunningTime = 0;
                 // we use Task.Run here to prevent blocking the update loop with a possibly long running task
-                Task.Run(GetCharacterNamesFromApiAndShowThemInLabel); // todo XXXXXXXXXXXXXXx testen ob das überhaupt so noch funktioniert
+                Task.Run(GetCharacterNamesFromApiAndShowThemInLabel);
             }
         }
 
@@ -336,7 +336,6 @@ namespace ExampleBlishhudModule
                 // can be down for up to a few days. That triggers a lot of api exceptions which would end up spamming the Sentry tool.
                 // Instead use Logger.Info() or .Warn() if you want to log api response errors. Those do not get stored by the Sentry tool.
                 // But you do not have to log api response exceptions. Just make sure that your module has no issues with failing api requests.
-                // this is just an example for logging.
                 Logger.Info("Failed to get character names from api.");
             }
         }
