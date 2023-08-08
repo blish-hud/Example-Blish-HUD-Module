@@ -90,6 +90,10 @@ namespace ExampleBlishhudModule
             // you can react to a user changing a setting value by subscribing to this event: 
             _enumExampleSetting.SettingChanged += UpdateCharacterWindowColor;
 
+            // If you really need to, you can recall your settings values with the SettingsManager
+            // It is better if you just hold onto the returned "SettingsEntry" instance when doing your initial DefineSetting, though
+            SettingEntry<string> setting1 = SettingsManager.ModuleSettings["ExampleSetting"] as SettingEntry<string>;
+
             // internal settings that should not be displayed to the user in the settings window have to be stored in subcollections
             // e.g. saving x,y position of a window
             _internalExampleSettingSubCollection = settings.AddSubCollection("internal settings (not visible in UI)");
@@ -105,30 +109,13 @@ namespace ExampleBlishhudModule
                 _charactersFlowPanel.BackgroundColor = Color.Blue;
         }
 
-        // Some API requests need an api key. e.g. accessing account data like inventory or bank content
-        // Blish hud gives you an api subToken you can use instead of the real api key the user entered in blish.
-        // But this api subToken may not be available when your module is loaded.
-        // Because of that api requests, which require an api key, may fail when they are called in Initialize() or LoadAsync().
-        // Or the user can delete the api key or add a new api key with the wrong permissions while your module is already running.
-        // You can react to that by subscribing to Gw2ApiManager.SubtokenUpdated. This event will be raised when your module gets the api subToken or
-        // when the user adds a new API key.
-        private async void OnApiSubTokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
-        {
-            await GetCharacterNamesFromApiAndShowThemInLabel();
-        }
-
         // Load content and more here. This call is asynchronous, so it is a good time to run
         // any long running steps for your module including loading resources from file or ref.
         // Use LoadAsync() instead of Initialize(), OnModuleLoaded() and ModuleLoaded event. The latter run synchronously and block the
         // blish update loop
         protected override async Task LoadAsync()
         {
-            Gw2ApiManager.SubtokenUpdated += OnApiSubTokenUpdated;
             createCharacterNamesWindow();
-
-            // usually the api subtoken is not available when the module is loaded. But in case it already is,
-            // we try to receive the character names from the api here.
-            await GetCharacterNamesFromApiAndShowThemInLabel();
 
             try
             {
@@ -142,10 +129,6 @@ namespace ExampleBlishhudModule
             {
                 Logger.Info($"Failed to get dungeons from api.");
             }
-
-            // If you really need to, you can recall your settings values with the SettingsManager
-            // It is better if you just hold onto the returned "TypeEntry" instance when doing your initial DefineSetting, though
-            SettingEntry<string> setting1 = SettingsManager.ModuleSettings["ExampleSetting"] as SettingEntry<string>;
 
             // Get your manifest registered directories with the DirectoriesManager
             foreach (string directoryName in this.DirectoriesManager.RegisteredDirectories)
@@ -224,12 +207,21 @@ namespace ExampleBlishhudModule
         // slowing down the overlay.
         protected override void Update(GameTime gameTime)
         {
-            _runningTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+            _notificationRunningTime += gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            if (_runningTime > 60000)
+            if (_notificationRunningTime > 60_000)
             {
-                _runningTime -= 60000;
+                _notificationRunningTime = 0;
                 ScreenNotification.ShowNotification("The examples module shows this message every 60 seconds!", ScreenNotification.NotificationType.Warning);
+            }
+
+            _updateCharactersRunningTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (_updateCharactersRunningTime > 5_000)
+            {
+                _updateCharactersRunningTime = 0;
+                // we use Task.Run here to prevent blocking the update loop with a possibly long running task
+                Task.Run(GetCharacterNamesFromApiAndShowThemInLabel); // todo XXXXXXXXXXXXXXx testen ob das überhaupt so noch funktioniert
             }
         }
 
@@ -244,7 +236,6 @@ namespace ExampleBlishhudModule
             // Not unsubscribing from events can result in the event subscriber (right side) being kept alive by the event publisher (left side).
             // This can lead to memory leaks and bugs where an object, that shouldnt exist aynmore,
             // still responds to events and is messing with your module.
-            Gw2ApiManager.SubtokenUpdated -= OnApiSubTokenUpdated;
             _enumExampleSetting.SettingChanged -= UpdateCharacterWindowColor;
 
             // Unload() can be called on your module anytime. Even while it is currently loading and creating the objects.
@@ -302,16 +293,20 @@ namespace ExampleBlishhudModule
 
         private async Task GetCharacterNamesFromApiAndShowThemInLabel()
         {
-            // check if api subToken has the permissions you need for your request: Gw2ApiManager.HasPermissions() 
+            // Some API requests need an api key. e.g. for accessing account data like inventory or bank content.
+            // Because of security reasons blish hud gives you an api subToken you can use instead of the real api key the user entered in blish.
             // Make sure that you added the api key permissions you need in the manifest.json.
-            // Don't set them to '"optional": false' if you dont plan to handle that case.
+            // Don't set them to '"optional": false' if you dont plan to handle that the user may disable certain permissions for your module.
             // e.g. the api request further down in this code needs the "characters" permission.
-            // if the Gw2ApiManager.HasPermissions returns false it can also mean, that your module did not get the api subtoken yet or the user removed
-            // the api key from blish hud. Because of that it is best practice to call .HasPermissions before every api request which requires an api key
+            // The api subToken may not be available when your module is loaded.
+            // Because of that api requests, which require an api key, may fail when they are called in Initialize() or LoadAsync().
+            // Or the user can delete the api key or add a new api key with the wrong permissions while your module is already running.
+            // To handle those cases you could subscribe to Gw2ApiManager.SubtokenUpdated event but this is considered as bad practice.
+            // Instead you should call Gw2ApiManager.HasPermissions before every api request that requires an api key.
             var apiKeyPermissions = new List<TokenPermission>
             {
-                TokenPermission.Account, // this permission can be used to check if your module got a token at all because every api key has it.
-                TokenPermission.Characters
+                TokenPermission.Account, // this permission can be used to check if your module got a token at all because every api key has this persmission.
+                TokenPermission.Characters // this is the permission we actually require here to get the character names
             };
 
             if (!Gw2ApiManager.HasPermissions(apiKeyPermissions))
@@ -335,14 +330,14 @@ namespace ExampleBlishhudModule
             }
             catch (Exception e)
             {
-                // this is just an example for logging.
-                // You do not have to log api response exceptions. Just make sure that your module has no issue with failing api requests.
                 // Warning:
-                // Blish Hud uses the tool Sentry in combination with the ErrorSubmissionModule to register ERROR and FATAL log entries.
-                // Because of that you must not use Logger.Error() or .Fatal() to log api response exceptions. Because sometimes the GW2 api
+                // Blish Hud uses the tool Sentry in combination with the ErrorSubmissionModule to upload ERROR and FATAL log entries to a web server.
+                // Because of that you must not use Logger.Error() or .Fatal() to log api response exceptions. Sometimes the GW2 api
                 // can be down for up to a few days. That triggers a lot of api exceptions which would end up spamming the Sentry tool.
                 // Instead use Logger.Info() or .Warn() if you want to log api response errors. Those do not get stored by the Sentry tool.
-                Logger.Info($"Failed to get character names from api.");
+                // But you do not have to log api response exceptions. Just make sure that your module has no issues with failing api requests.
+                // this is just an example for logging.
+                Logger.Info("Failed to get character names from api.");
             }
         }
 
@@ -359,10 +354,11 @@ namespace ExampleBlishhudModule
         private List<Dungeon> _dungeons = new List<Dungeon>();
         private CornerIcon _exampleCornerIcon;
         private ContextMenuStrip _dungeonContextMenuStrip;
-        private double _runningTime;
         private Label _charactersHeaderLabel;
         private Label _characterNamesLabel;
         private FlowPanel _charactersFlowPanel;
         private StandardWindow _exampleWindow;
+        private double _notificationRunningTime;
+        private double _updateCharactersRunningTime;
     }
 }
