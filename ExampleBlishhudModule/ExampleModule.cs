@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -141,8 +142,11 @@ namespace ExampleBlishhudModule
             }
 
             // Load content from the ref directory in the module.bhm automatically with the ContentsManager
-            _mugTexture = ContentsManager.GetTexture("603447.png");
             _windowBackgroundTexture = ContentsManager.GetTexture("155985.png");
+            _mugTexture = ContentsManager.GetTexture("test/603447.png");
+            // if you want to reuse some gw2 textures without having to add them to the ref folder, you can search them here: https://search.gw2dat.com/
+            // Then you can use the texture asset id to get that texture. e.g. 603447 from https://assets.gw2dat.com/603447.png
+            GameService.Content.DatAssetCache.TryGetTextureFromAssetId(603447, out AsyncTexture2D mugTextureFromAssetCache);
 
             // show a window with gw2 window style.
             _exampleWindow = new StandardWindow(
@@ -166,7 +170,7 @@ namespace ExampleBlishhudModule
             // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
             _exampleCornerIcon = new CornerIcon()
             {
-                Icon             = _mugTexture,
+                Icon             = mugTextureFromAssetCache,
                 BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
                 // Priority determines the position relative to cornerIcons of other modules
                 // because of that it MUST be set to a constant random value.
@@ -245,8 +249,9 @@ namespace ExampleBlishhudModule
             _dungeonContextMenuStrip?.Dispose();
             _charactersFlowPanel?.Dispose(); // this will dispose the child labels we added as well
             _exampleWindow?.Dispose();
-            _windowBackgroundTexture?.Dispose();
-            _mugTexture?.Dispose();
+            // only .Dispose() textures you created yourself or loaded from your ref folder
+            // NEVER .Dipose() textures from DatAssetCache because those textures are shared between modules and blish.
+            _windowBackgroundTexture?.Dispose(); 
 
             // All static members must be manually unset
             // Static members are not automatically cleared and will keep a reference to your,
