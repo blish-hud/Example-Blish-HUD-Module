@@ -18,6 +18,11 @@ using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
+// You can rename the namespace to whatever you want. Including the module name in the namespace is good idea.
+// If you change this in the future again after you already released a module version, you should let freesnow know about it.
+// Because they have to update that in the Sentry Blish Bug tracker, too.
+// This namespace does not have to match the namespace in the manifest.json. They are not related. 
+// (Side note: the manifest.json namespace has to be set once and must NOT be changed after a module was released)
 namespace ExampleBlishhudModule
 {
     [Export(typeof(Module))]
