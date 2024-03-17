@@ -157,23 +157,7 @@ namespace ExampleBlishhudModule
             // option 2: 
             var windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 
-            // show a window with gw2 window style.
-            _exampleWindow = new StandardWindow(
-                windowBackgroundTexture,
-                new Rectangle(25, 26, 560, 640),
-                new Rectangle(40, 50, 540, 590))
-            {
-                Parent        = GameService.Graphics.SpriteScreen,
-                Title         = "Example Window Title",
-                Emblem        = _mugTexture,
-                Subtitle      = "Example Subtitle",
-                Location      = new Point(300, 300),
-                SavesPosition = true,
-                Id = $"{nameof(ExampleModule)}_My_Unique_ID_123" // Id has to be unique not only in your module but also within blish core and any other module
-            };
-
-            // show blish hud overlay settings content inside the window
-            _exampleWindow.Show(new OverlaySettingsView());
+            await CreateAGw2StyleWindowThatDisplaysAllCurrencies(windowBackgroundTexture);
 
             // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
             _exampleCornerIcon = new CornerIcon()
@@ -351,6 +335,62 @@ namespace ExampleBlishhudModule
                 // But you do not have to log api response exceptions. Just make sure that your module has no issues with failing api requests.
                 Logger.Info("Failed to get character names from api.");
             }
+        }
+
+        private async Task CreateAGw2StyleWindowThatDisplaysAllCurrencies(AsyncTexture2D windowBackgroundTexture)
+        {
+            // get all currencies from the api
+            var currencies = new List<Currency>();
+            try
+            {
+                var apiCurrencies = await Gw2ApiManager.Gw2ApiClient.V2.Currencies.AllAsync();
+                currencies.AddRange(apiCurrencies);
+            }
+            catch (Exception e)
+            {
+                Logger.Info("Failed to get currencies from api.");
+            }
+
+            // create a window with gw2 window style.
+            _exampleWindow = new StandardWindow(
+                windowBackgroundTexture,
+                new Rectangle(25, 26, 560, 640),
+                new Rectangle(40, 50, 540, 590))
+            {
+                Parent = GameService.Graphics.SpriteScreen,
+                Title = "Example Window Title",
+                Emblem = _mugTexture,
+                Subtitle = "Example Subtitle",
+                Location = new Point(300, 300),
+                SavesPosition = true,
+                Id = $"{nameof(ExampleModule)}_My_Unique_ID_123" // Id has to be unique not only in your module but also within blish core and any other module
+            };
+
+            // add a panel to the window
+            var currenciesFlowPanel = new FlowPanel
+            {
+                Title = "currencies",
+                FlowDirection = ControlFlowDirection.LeftToRight,
+                Width = 500,
+                CanCollapse = true,
+                HeightSizingMode = SizingMode.AutoSize,
+                Parent = _exampleWindow,
+            };
+
+            // show all currencies in the panel
+            foreach (var currency in currencies)
+            {
+                var iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(currency.Icon.Url.AbsoluteUri));
+                var tooltipText = $"{currency.Name}\n{currency.Description}";
+                new Image(AsyncTexture2D.FromAssetId(iconAssetId))
+                {
+                    BasicTooltipText = tooltipText,
+                    Size = new Point(40),
+                    Parent = currenciesFlowPanel,
+                };
+            }
+
+            _exampleWindow.Show();
         }
 
         internal static ExampleModule ExampleModuleInstance;
