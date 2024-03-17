@@ -15,4 +15,4 @@
 
 Additional infos for debugging ("Configuring Your Project" can be ignored): https://blishhud.com/docs/modules/overview/debugging
 
-[example module picture](docs/exampleModule.png)
+![example module picture](docs/exampleModule.png)
