@@ -121,7 +121,7 @@ namespace ExampleBlishhudModule
         // blish update loop
         protected override async Task LoadAsync()
         {
-            createCharacterNamesWindow();
+            CreateCharacterNamesWindow();
 
             try
             {
@@ -267,7 +267,7 @@ namespace ExampleBlishhudModule
             ExampleModuleInstance = null;
         }
 
-        private void createCharacterNamesWindow()
+        private void CreateCharacterNamesWindow()
         {
             _charactersFlowPanel = new FlowPanel()
             {
