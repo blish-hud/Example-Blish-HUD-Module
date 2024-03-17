@@ -146,18 +146,22 @@ namespace ExampleBlishhudModule
                 Logger.Info($"'{directoryName}' can be found at '{fullDirectoryPath}' and has {allFiles.Count} total files within it.");
             }
 
-            // Load content from the ref directory in the module.bhm automatically with the ContentsManager
-            _windowBackgroundTexture = ContentsManager.GetTexture("155985.png");
+            // Load content from the ref directory in the module.bhm with the ContentsManager
             _mugTexture = ContentsManager.GetTexture("test/603447.png");
-            // if you want to reuse some gw2 textures without having to add them to the ref folder, you can search them here: https://search.gw2dat.com/
-            // Then you can use the texture asset id to get that texture. e.g. 603447 from https://assets.gw2dat.com/603447.png
-            GameService.Content.DatAssetCache.TryGetTextureFromAssetId(603447, out AsyncTexture2D mugTextureFromAssetCache);
+
+            // if you want to use gw2 textures without having to add them to the ref folder, you can use DatAssetCache instead:
+            // search the texture here: https://search.gw2dat.com/ and get the texture asset id. e.g. 155997 from https://assets.gw2dat.com/155997.png
+            // Now get the texture with DatAssetCache in one of the following ways:
+            // option 1: 
+            // GameService.Content.DatAssetCache.TryGetTextureFromAssetId(155997, out AsyncTexture2D windowBackground);
+            // option 2: 
+            var windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 
             // show a window with gw2 window style.
             _exampleWindow = new StandardWindow(
-                _windowBackgroundTexture,
-                new Rectangle(40, 26, 913, 691),
-                new Rectangle(70, 71, 839, 605))
+                windowBackgroundTexture,
+                new Rectangle(25, 26, 560, 640),
+                new Rectangle(40, 50, 540, 590))
             {
                 Parent        = GameService.Graphics.SpriteScreen,
                 Title         = "Example Window Title",
@@ -165,8 +169,7 @@ namespace ExampleBlishhudModule
                 Subtitle      = "Example Subtitle",
                 Location      = new Point(300, 300),
                 SavesPosition = true,
-                // Id has to be unique not only in your module but also within blish core and any other module
-                Id = $"{nameof(ExampleModule)}_My_Unique_ID_123" 
+                Id = $"{nameof(ExampleModule)}_My_Unique_ID_123" // Id has to be unique not only in your module but also within blish core and any other module
             };
 
             // show blish hud overlay settings content inside the window
@@ -175,7 +178,7 @@ namespace ExampleBlishhudModule
             // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
             _exampleCornerIcon = new CornerIcon()
             {
-                Icon             = mugTextureFromAssetCache,
+                Icon             = _mugTexture,
                 BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
                 // Priority determines the position relative to cornerIcons of other modules
                 // because of that it MUST be set to a constant random value.
@@ -256,7 +259,6 @@ namespace ExampleBlishhudModule
             _exampleWindow?.Dispose();
             // only .Dispose() textures you created yourself or loaded from your ref folder
             // NEVER .Dipose() textures from DatAssetCache because those textures are shared between modules and blish.
-            _windowBackgroundTexture?.Dispose(); 
             _mugTexture?.Dispose(); 
 
             // All static members must be manually unset
@@ -359,7 +361,6 @@ namespace ExampleBlishhudModule
         private SettingEntry<string> _stringExampleSetting;
         private SettingEntry<ColorType> _enumExampleSetting;
         private SettingCollection _internalExampleSettingSubCollection;
-        private Texture2D _windowBackgroundTexture;
         private Texture2D _mugTexture;
         private List<Dungeon> _dungeons = new List<Dungeon>();
         private CornerIcon _exampleCornerIcon;
