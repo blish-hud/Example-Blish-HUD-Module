@@ -14,3 +14,5 @@
 7. Press the green arrow to start blish with the example module in debug mode. It will overlay Guild Wars 2 or the powershell window depending on what you picked in the previous steps.
 
 Additional infos for debugging ("Configuring Your Project" can be ignored): https://blishhud.com/docs/modules/overview/debugging
+
+[example module picture](docs/exampleModule.png)
