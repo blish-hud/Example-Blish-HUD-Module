@@ -257,6 +257,7 @@ namespace ExampleBlishhudModule
             // only .Dispose() textures you created yourself or loaded from your ref folder
             // NEVER .Dipose() textures from DatAssetCache because those textures are shared between modules and blish.
             _windowBackgroundTexture?.Dispose(); 
+            _mugTexture?.Dispose(); 
 
             // All static members must be manually unset
             // Static members are not automatically cleared and will keep a reference to your,
