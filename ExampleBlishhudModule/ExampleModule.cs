@@ -123,13 +123,13 @@ namespace ExampleBlishhudModule
         {
             CreateCharacterNamesWindow();
 
+            var dungeons = new List<Dungeon>();
             try
             {
                 // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
                 // Because of that it is not necessary to check for api key permissions in this case or for the api subtoken to be available.
                 var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
-                _dungeons.Clear();
-                _dungeons.AddRange(dungeonRequest.ToList());
+                dungeons.AddRange(dungeonRequest.ToList());
             }
             catch (Exception e)
             {
@@ -182,7 +182,7 @@ namespace ExampleBlishhudModule
             // Add a right click menu to the corner icon which lists all dungeons with their dungeons paths as subcategories (pulled from the API)
             _dungeonContextMenuStrip = new ContextMenuStrip();
 
-            foreach (var dungeon in _dungeons)
+            foreach (var dungeon in dungeons)
             {
                 var dungeonPathMenu = new ContextMenuStrip();
 
@@ -402,7 +402,6 @@ namespace ExampleBlishhudModule
         private SettingEntry<ColorType> _enumExampleSetting;
         private SettingCollection _internalExampleSettingSubCollection;
         private Texture2D _mugTexture;
-        private List<Dungeon> _dungeons = new List<Dungeon>();
         private CornerIcon _exampleCornerIcon;
         private ContextMenuStrip _dungeonContextMenuStrip;
         private Label _charactersHeaderLabel;
