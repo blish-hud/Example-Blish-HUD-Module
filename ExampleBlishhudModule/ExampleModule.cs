@@ -268,7 +268,7 @@ namespace ExampleBlishhudModule
                 Parent = GameService.Graphics.SpriteScreen,
             };
 
-            _charactersHeaderLabel = new Label() // this label is used as heading
+            new Label() // this label is used as heading
             {
                 Text = "My Characters:",
                 TextColor = Color.Red,
@@ -409,7 +409,6 @@ namespace ExampleBlishhudModule
         private Texture2D _mugTexture;
         private CornerIcon _exampleCornerIcon;
         private ContextMenuStrip _dungeonContextMenuStrip;
-        private Label _charactersHeaderLabel;
         private Label _characterNamesLabel;
         private FlowPanel _charactersFlowPanel;
         private StandardWindow _exampleWindow;
