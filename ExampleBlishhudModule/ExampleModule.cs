@@ -121,21 +121,6 @@ namespace ExampleBlishhudModule
         // blish update loop
         protected override async Task LoadAsync()
         {
-            CreateCharacterNamesWindow();
-
-            var dungeons = new List<Dungeon>();
-            try
-            {
-                // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
-                // Because of that it is not necessary to check for api key permissions in this case or for the api subtoken to be available.
-                var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
-                dungeons.AddRange(dungeonRequest.ToList());
-            }
-            catch (Exception e)
-            {
-                Logger.Info("Failed to get dungeons from api.");
-            }
-
             // Get your manifest registered directories with the DirectoriesManager. Those can be used to store data.
             foreach (string directoryName in DirectoriesManager.RegisteredDirectories)
             {
@@ -157,43 +142,10 @@ namespace ExampleBlishhudModule
             // option 2: 
             var windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 
-            await CreateAGw2StyleWindowThatDisplaysAllCurrencies(windowBackgroundTexture);
-
-            // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
-            _exampleCornerIcon = new CornerIcon()
-            {
-                Icon             = _mugTexture,
-                BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
-                // Priority determines the position relative to cornerIcons of other modules
-                // because of that it MUST be set to a constant random value.
-                // Do not recalculate this value on every module start up. Just use a constant value.
-                // It has to be random to prevent that two modules use the same priority (e.g. "4") which would cause the cornerIcons to be in 
-                // a different position on every startup.
-                Priority         = 1645843523, 
-                Parent           = GameService.Graphics.SpriteScreen
-            };
-
-            // Show a notification in the middle of the screen when the icon is clicked
-            _exampleCornerIcon.Click += delegate
-            {
-                ScreenNotification.ShowNotification("Hello from Blish HUD!");
-            };
-
-            // Add a right click menu to the corner icon which lists all dungeons with their dungeons paths as subcategories (pulled from the API)
-            _dungeonContextMenuStrip = new ContextMenuStrip();
-
-            foreach (var dungeon in dungeons)
-            {
-                var dungeonPathMenu = new ContextMenuStrip();
-
-                foreach (var path in dungeon.Paths)
-                    dungeonPathMenu.AddMenuItem($"{path.Id} ({path.Type})");
-
-                var dungeonMenuItem = _dungeonContextMenuStrip.AddMenuItem(dungeon.Id);
-                dungeonMenuItem.Submenu = dungeonPathMenu;
-            }
-
-            _exampleCornerIcon.Menu = _dungeonContextMenuStrip;
+            // Create some UI
+            await CreateGw2StyleWindowThatDisplaysAllCurrencies(windowBackgroundTexture);
+            CreateWindowWithCharacterNames();
+            await CreateCornerIconWithDungeonsContextMenu();
         }
 
         // Allows your module to run logic such as updating UI elements,
@@ -250,8 +202,61 @@ namespace ExampleBlishhudModule
             // module unless manually unset.
             ExampleModuleInstance = null;
         }
+        
+        private async Task CreateCornerIconWithDungeonsContextMenu()
+        {
+            // get all dungeons from the api
+            var dungeons = new List<Dungeon>();
+            try
+            {
+                // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
+                // Because of that it is not necessary to check for api key permissions in this case or for the api subtoken to be available.
+                var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
+                dungeons.AddRange(dungeonRequest.ToList());
+            }
+            catch (Exception e)
+            {
+                Logger.Info("Failed to get dungeons from api.");
+            }
 
-        private void CreateCharacterNamesWindow()
+            // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
+            _exampleCornerIcon = new CornerIcon()
+            {
+                Icon = _mugTexture,
+                BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
+                // Priority determines the position relative to cornerIcons of other modules
+                // because of that it MUST be set to a constant random value.
+                // Do not recalculate this value on every module start up. Just use a constant value.
+                // It has to be random to prevent that two modules use the same priority (e.g. "4") which would cause the cornerIcons to be in 
+                // a different position on every startup.
+                Priority = 1645843523,
+                Parent = GameService.Graphics.SpriteScreen
+            };
+
+            // Show a notification in the middle of the screen when the icon is clicked
+            _exampleCornerIcon.Click += delegate
+            {
+                ScreenNotification.ShowNotification("Hello from Blish HUD!");
+            };
+
+            // Add a right click menu to the corner icon which lists all dungeons with their dungeons paths as subcategories (pulled from the API)
+            _dungeonContextMenuStrip = new ContextMenuStrip();
+
+            foreach (var dungeon in dungeons)
+            {
+                var dungeonPathMenu = new ContextMenuStrip();
+
+                foreach (var path in dungeon.Paths)
+                    dungeonPathMenu.AddMenuItem($"{path.Id} ({path.Type})");
+
+                var dungeonMenuItem = _dungeonContextMenuStrip.AddMenuItem(dungeon.Id);
+                dungeonMenuItem.Submenu = dungeonPathMenu;
+            }
+
+            _exampleCornerIcon.Menu = _dungeonContextMenuStrip;
+        }
+
+        private void CreateWindowWithCharacterNames()
         {
             _charactersFlowPanel = new FlowPanel()
             {
@@ -337,7 +342,7 @@ namespace ExampleBlishhudModule
             }
         }
 
-        private async Task CreateAGw2StyleWindowThatDisplaysAllCurrencies(AsyncTexture2D windowBackgroundTexture)
+        private async Task CreateGw2StyleWindowThatDisplaysAllCurrencies(AsyncTexture2D windowBackgroundTexture)
         {
             // get all currencies from the api
             var currencies = new List<Currency>();
