@@ -145,7 +145,7 @@ namespace ExampleBlishhudModule
             // Create some UI
             await CreateGw2StyleWindowThatDisplaysAllCurrencies(windowBackgroundTexture);
             CreateWindowWithCharacterNames();
-            await CreateCornerIconWithDungeonsContextMenu();
+            CreateCornerIconWithDungeonsContextMenu();
         }
 
         // Allows your module to run logic such as updating UI elements,
@@ -189,8 +189,8 @@ namespace ExampleBlishhudModule
             // Unload() can be called on your module anytime. Even while it is currently loading and creating the objects.
             // Because of that you always have to check if the objects you want to access in Unload() are not null.
             // This can be done by using if null checks or by using the null-condition operator ?. (question mark with dot).
-            _exampleCornerIcon?.Dispose();
-            _dungeonContextMenuStrip?.Dispose();
+            _cornerIcon?.Dispose();
+            _contextMenuStrip?.Dispose();
             _charactersFlowPanel?.Dispose(); // this will dispose the child labels we added as well
             _exampleWindow?.Dispose();
             // only .Dispose() textures you created yourself or loaded from your ref folder
@@ -203,57 +203,37 @@ namespace ExampleBlishhudModule
             ExampleModuleInstance = null;
         }
         
-        private async Task CreateCornerIconWithDungeonsContextMenu()
+        private void CreateCornerIconWithDungeonsContextMenu()
         {
-            // get all dungeons from the api
-            var dungeons = new List<Dungeon>();
-            try
-            {
-                // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
-                // Because of that it is not necessary to check for api key permissions in this case or for the api subtoken to be available.
-                var dungeonRequest = await Gw2ApiManager.Gw2ApiClient.V2.Dungeons.AllAsync();
-                dungeons.AddRange(dungeonRequest.ToList());
-            }
-            catch (Exception e)
-            {
-                Logger.Info("Failed to get dungeons from api.");
-            }
-
-            // Add a mug corner icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
-            _exampleCornerIcon = new CornerIcon()
+            // Add a menu icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
+            // Priority: Determines the position relative to cornerIcons of other modules
+            // because of that it MUST be set to a constant random value.
+            // Do not recalculate this value on every module start up. Just use a constant value.
+            // It has to be random to prevent that two modules use the same priority (e.g. "4") which would cause the cornerIcons to be in 
+            // a different position on every startup.
+            _cornerIcon = new CornerIcon()
             {
                 Icon = _mugTexture,
                 BasicTooltipText = $"My Corner Icon Tooltip for {Name}",
-                // Priority determines the position relative to cornerIcons of other modules
-                // because of that it MUST be set to a constant random value.
-                // Do not recalculate this value on every module start up. Just use a constant value.
-                // It has to be random to prevent that two modules use the same priority (e.g. "4") which would cause the cornerIcons to be in 
-                // a different position on every startup.
                 Priority = 1645843523,
                 Parent = GameService.Graphics.SpriteScreen
             };
 
             // Show a notification in the middle of the screen when the icon is clicked
-            _exampleCornerIcon.Click += delegate
+            _cornerIcon.Click += delegate
             {
                 ScreenNotification.ShowNotification("Hello from Blish HUD!");
             };
 
-            // Add a right click menu to the corner icon which lists all dungeons with their dungeons paths as subcategories (pulled from the API)
-            _dungeonContextMenuStrip = new ContextMenuStrip();
-
-            foreach (var dungeon in dungeons)
-            {
-                var dungeonPathMenu = new ContextMenuStrip();
-
-                foreach (var path in dungeon.Paths)
-                    dungeonPathMenu.AddMenuItem($"{path.Id} ({path.Type})");
-
-                var dungeonMenuItem = _dungeonContextMenuStrip.AddMenuItem(dungeon.Id);
-                dungeonMenuItem.Submenu = dungeonPathMenu;
-            }
-
-            _exampleCornerIcon.Menu = _dungeonContextMenuStrip;
+            // Add a right click menu to the corner icon
+            _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.AddMenuItem("A");
+            var bMenuItem = _contextMenuStrip.AddMenuItem("B");
+            var bSubMenuStrip = new ContextMenuStrip();
+            bSubMenuStrip.AddMenuItem("B1");
+            bSubMenuStrip.AddMenuItem("B2");
+            bMenuItem.Submenu = bSubMenuStrip;
+            _cornerIcon.Menu = _contextMenuStrip;
         }
 
         private void CreateWindowWithCharacterNames()
@@ -348,6 +328,8 @@ namespace ExampleBlishhudModule
             var currencies = new List<Currency>();
             try
             {
+                // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
+                // Because of that it is not necessary to check for api key permissions or for the api subtoken to be available.
                 var apiCurrencies = await Gw2ApiManager.Gw2ApiClient.V2.Currencies.AllAsync();
                 currencies.AddRange(apiCurrencies);
             }
@@ -407,8 +389,8 @@ namespace ExampleBlishhudModule
         private SettingEntry<ColorType> _enumExampleSetting;
         private SettingCollection _internalExampleSettingSubCollection;
         private Texture2D _mugTexture;
-        private CornerIcon _exampleCornerIcon;
-        private ContextMenuStrip _dungeonContextMenuStrip;
+        private CornerIcon _cornerIcon;
+        private ContextMenuStrip _contextMenuStrip;
         private Label _characterNamesLabel;
         private FlowPanel _charactersFlowPanel;
         private StandardWindow _exampleWindow;
