@@ -9,7 +9,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
-using Blish_HUD.Overlay.UI.Views;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -160,6 +159,7 @@ namespace ExampleBlishhudModule
             if (_notificationRunningTime > 60_000)
             {
                 _notificationRunningTime = 0;
+                // Show a notification in the middle of the screen
                 ScreenNotification.ShowNotification("The examples module shows this message every 60 seconds!", ScreenNotification.NotificationType.Warning);
             }
 
@@ -219,11 +219,8 @@ namespace ExampleBlishhudModule
                 Parent = GameService.Graphics.SpriteScreen
             };
 
-            // Show a notification in the middle of the screen when the icon is clicked
-            _cornerIcon.Click += delegate
-            {
-                ScreenNotification.ShowNotification("Hello from Blish HUD!");
-            };
+            // Clicking on the cornerIcon shows/hides the example window
+            _cornerIcon.Click += (s, e) => _exampleWindow.ToggleWindow();
 
             // Add a right click menu to the corner icon
             _contextMenuStrip = new ContextMenuStrip();
