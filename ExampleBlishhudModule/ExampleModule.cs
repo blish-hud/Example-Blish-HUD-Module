@@ -298,14 +298,11 @@ namespace ExampleBlishhudModule
             // Examples are timeouts or the api is down or the api randomly responds with an error code instead of the correct response.
             // Because of that always use try catch when doing api requests to catch api request exceptions.
             // otherwise api request exceptions can crash your module and blish hud.
+            IEnumerable<Character> charactersApiResponse = new List<Character>();
             try
             {
-                // request characters endpoint from api. 
-                var charactersResponse = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
-                // extract character names from the api response and show them inside a label
-                var characterNames = charactersResponse.Select(c => c.Name);
-                var characterNamesText = string.Join("\n", characterNames);
-                _characterNamesLabel.Text = characterNamesText;
+                // request characters endpoint from api
+                charactersApiResponse = await Gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync();
             }
             catch (Exception e)
             {
@@ -317,18 +314,22 @@ namespace ExampleBlishhudModule
                 // But you do not have to log api response exceptions. Just make sure that your module has no issues with failing api requests.
                 Logger.Info("Failed to get character names from api.");
             }
+
+            // extract character names from api response and show them inside a label
+            var characterNames = charactersApiResponse.Select(c => c.Name).ToList();
+            var characterNamesText = string.Join("\n", characterNames);
+            _characterNamesLabel.Text = characterNamesText;
         }
 
         private async Task CreateGw2StyleWindowThatDisplaysAllCurrencies(AsyncTexture2D windowBackgroundTexture)
         {
             // get all currencies from the api
-            var currencies = new List<Currency>();
+            IEnumerable<Currency> currenciesApiResponse = new List<Currency>();
             try
             {
                 // Use the Gw2ApiManager to make requests to the API. Some Api requests, like this one, do not need an api key.
                 // Because of that it is not necessary to check for api key permissions or for the api subtoken to be available.
-                var apiCurrencies = await Gw2ApiManager.Gw2ApiClient.V2.Currencies.AllAsync();
-                currencies.AddRange(apiCurrencies);
+                currenciesApiResponse = await Gw2ApiManager.Gw2ApiClient.V2.Currencies.AllAsync();
             }
             catch (Exception e)
             {
@@ -362,7 +363,7 @@ namespace ExampleBlishhudModule
             };
 
             // show all currencies in the panel
-            foreach (var currency in currencies)
+            foreach (var currency in currenciesApiResponse)
             {
                 var iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(currency.Icon.Url.AbsoluteUri));
                 var tooltipText = $"{currency.Name}\n{currency.Description}";
