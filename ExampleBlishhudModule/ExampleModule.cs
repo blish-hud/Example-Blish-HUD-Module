@@ -144,7 +144,7 @@ namespace ExampleBlishhudModule
             // Create some UI
             await CreateGw2StyleWindowThatDisplaysAllCurrencies(windowBackgroundTexture);
             CreateWindowWithCharacterNames();
-            CreateCornerIconWithDungeonsContextMenu();
+            CreateCornerIconWithContextMenu();
         }
 
         // Allows your module to run logic such as updating UI elements,
@@ -203,7 +203,7 @@ namespace ExampleBlishhudModule
             ExampleModuleInstance = null;
         }
         
-        private void CreateCornerIconWithDungeonsContextMenu()
+        private void CreateCornerIconWithContextMenu()
         {
             // Add a menu icon in the top left next to the other icons in guild wars 2 (e.g. inventory icon, Mail icon)
             // Priority: Determines the position relative to cornerIcons of other modules
