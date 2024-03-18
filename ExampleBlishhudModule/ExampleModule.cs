@@ -280,8 +280,8 @@ namespace ExampleBlishhudModule
             // The api subToken may not be available when your module is loaded.
             // Because of that api requests, which require an api key, may fail when they are called in Initialize() or LoadAsync().
             // Or the user can delete the api key or add a new api key with the wrong permissions while your module is already running.
-            // To handle those cases you could subscribe to Gw2ApiManager.SubtokenUpdated event but this is considered as bad practice.
-            // Instead you should call Gw2ApiManager.HasPermissions before every api request that requires an api key.
+            // To handle those cases you could subscribe to Gw2ApiManager.SubtokenUpdated event (not shown here).
+            // Nevertheless you should call Gw2ApiManager.HasPermissions() before every api request that requires an api key.
             var apiKeyPermissions = new List<TokenPermission>
             {
                 TokenPermission.Account, // this permission can be used to check if your module got a token at all because every api key has this persmission.
