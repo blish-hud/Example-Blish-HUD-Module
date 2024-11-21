@@ -159,7 +159,10 @@ namespace ExampleBlishhudModule
             if (_notificationRunningTime > 60_000)
             {
                 _notificationRunningTime = 0;
-                // Show a notification in the middle of the screen
+                // Show a notification in the middle of the screen. If you want to use this kind of notification,
+                // you may want to add your module name to the message. Blish users usually have multiple
+                // modules installed. A notification like that popping up can cause confusion because it can be hard to find out which
+                // module triggered the notification.
                 ScreenNotification.ShowNotification("The examples module shows this message every 60 seconds!", ScreenNotification.NotificationType.Warning);
             }
 
