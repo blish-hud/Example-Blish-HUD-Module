@@ -370,7 +370,20 @@ namespace ExampleBlishhudModule
             {
                 var iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(currency.Icon.Url.AbsoluteUri));
                 var tooltipText = $"{currency.Name}\n{currency.Description}";
-                new Image(AsyncTexture2D.FromAssetId(iconAssetId))
+                var texture = AsyncTexture2D.FromAssetId(iconAssetId);
+
+                if (texture == null)
+                {
+                    // Reason for null check:
+                    // - FromAssetId() gets a texture from a blish backend server and stores it in a cache folder on the PC for faster loading.
+                    // The textures in this backend server are updated manually. Because of that after new content for gw2 is released, new textures,
+                    // e.g. for new currencies, will be missing until they are added to the backend server.
+                    // - textures may be available on the backend server, but still fail to download or load from the local cache for various reasons.
+                    texture = ContentService.Textures.Error; // this will display a pink error placeholder texture.
+                    tooltipText += "\n(Failed to load texture)";
+                }
+
+                new Image(texture)
                 {
                     BasicTooltipText = tooltipText,
                     Size = new Point(40),
